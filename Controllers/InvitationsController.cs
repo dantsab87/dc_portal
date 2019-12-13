@@ -72,6 +72,7 @@ namespace dc_portal.Controllers
                 db.SaveChanges();
 
                 await invitation.EmailInvitation();
+                TempData["Invitation-Sent"] = "Your invitation has been sent!";
 
                 return RedirectToAction("Dashboard", "Home");
             }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using dc_portal.Extensions;
 using dc_portal.Models;
 using Microsoft.AspNet.Identity;
 
@@ -41,7 +42,9 @@ namespace dc_portal.Controllers
         public ActionResult Create()
         {
             var houseId = db.Users.Find(User.Identity.GetUserId()).HouseholdId ?? 0;
-            ViewBag.BankAccountId = new SelectList(db.BankAccounts, "Id", "OwnerId");
+            ViewBag.BankAccountId = new SelectList(db.BankAccounts.Where(b => b.HouseholdId == houseId), "Id", "Name");
+            //ViewBag.BudgetItemId = new SelectList(db.BudgetItems.Where(bi=>bi.BudgetItems == houseId), "Id", "Name");
+            //ViewBag.BankAccountId = new SelectList(db.BankAccounts, "Id", "OwnerId");
             ViewBag.BudgetItemId = new SelectList(db.BudgetItems, "Id", "Name");
             //ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName");
             return View();
@@ -52,19 +55,31 @@ namespace dc_portal.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,BankAccountId,BudgetItemId,OwnerId,TransactionType,Created,Amount,Memo")] Transaction transaction)
+        public ActionResult Create([Bind(Include = "BankAccountId,BudgetItemId,TransactionType,Amount,Memo")] Transaction transaction)
         {
             if (ModelState.IsValid)
             {
+                transaction.OwnerId = User.Identity.GetUserId();
+                transaction.Created = DateTime.Now;
                 db.Transactions.Add(transaction);
                 db.SaveChanges();
-                return RedirectToAction("Index");
-            }
 
-            ViewBag.BankAccountId = new SelectList(db.BankAccounts, "Id", "OwnerId", transaction.BankAccountId);
+                //transaction extensions to keep associated bank and budget balances up to date
+                transaction.UpdateBalances();
+                transaction.ManageNotifications();
+
+                return RedirectToAction("Dashboard", "Home");
+                //db.Transactions.Add(transaction);
+                //db.SaveChanges();
+                //return RedirectToAction("Index");
+            }
             ViewBag.BudgetItemId = new SelectList(db.BudgetItems, "Id", "Name", transaction.BudgetItemId);
             ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName", transaction.OwnerId);
             return View(transaction);
+            //ViewBag.BankAccountId = new SelectList(db.BankAccounts, "Id", "OwnerId", transaction.BankAccountId);
+            //ViewBag.BudgetItemId = new SelectList(db.BudgetItems, "Id", "Name", transaction.BudgetItemId);
+            //ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName", transaction.OwnerId);
+            //return View(transaction);
         }
 
         // GET: Transactions/Edit/5

@@ -41,25 +41,102 @@ namespace dc_portal.Controllers
             return View(household);
         }
 
+
+        //get Households/config/5
+
+        public ActionResult Config(int? Id)
+        {
+            var userId = User.Identity.GetUserId();
+            var user = db.Users.Find(userId);
+
+            if (Id != null && Id != 0 && user.Household.IsConfigured == false) 
+            {
+                ViewBag.HouseholdId = (int)Id;
+                return View(Id);
+            }
+            return RedirectToAction("Dashboard", "Home");
+        }
+
+        //post Households/config/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Config(ConfigVM configVM)
+        {       
+            var userId = User.Identity.GetUserId();
+            var user = db.Users.Find(userId);
+
+            if (ModelState.IsValid)
+            {
+                var bank = new BankAccount
+                {
+                    HouseholdId = configVM.HouseHoldId,
+                    Name = configVM.Name,
+                    StartingBalance = configVM.StartingBalance,
+                    LowBalanceLevel = configVM.LowBalance,
+                    AccountType = configVM.AccountType,
+
+                    Created = DateTime.Now,
+                    CurrentBalance = configVM.StartingBalance,
+                    OwnerId = userId
+                };
+
+                db.BankAccounts.Add(bank);
+                db.SaveChanges();
+
+                var budget = new Budget
+                {
+                    Name = configVM.BudgetName,
+                    Created = DateTime.Now,
+                    OwnerId = userId,
+                    HouseholdId = configVM.HouseHoldId,
+                    TargetAmount = 0
+                };
+
+                db.Budgets.Add(budget);
+                db.SaveChanges();
+
+                var bItems = new BudgetItem
+                {
+                    Name = configVM.BIName,
+                    TargetAmount = configVM.TargetAmount,
+                    BudgetId = budget.Id,
+                    Created = DateTime.Now,
+                    CurrentAmount = 0
+                };
+
+
+                db.BudgetItems.Add(bItems);
+                user.Household.IsConfigured = true;
+                TempData["Complete_HH_config"] = "You have just configured your Household!";
+                db.SaveChanges();
+
+                return RedirectToAction("Dashboard", "Home");
+            }
+            return View(configVM);
+        }
+
+
         // GET: Households/Create
         public ActionResult Create()
         {
+            if (User.IsInRole("Guest"))
+            {
+                return View();
+            }
             if (User.IsInRole("Head of Household"))
             {
                 TempData["MustLeaveHH"] = "If you want to create a new HouseHold or join a new one, please leave your current Household.";
                 return RedirectToAction("Dashboard", "Home");
             }
-            else 
-            {
-                return View();            
-            }
 
+            return View();
         }
 
         // POST: Households/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "Guest")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,Name,Greeting")] Household household)
         {
@@ -71,11 +148,13 @@ namespace dc_portal.Controllers
                     var user = db.Users.Find(userId);
 
                     roleHelper.RemoveUserFromRole(user.Id, "Guest");
-                    roleHelper.AddUserToRole(user.Id, "Head of Household");
+
 
                     household.Created = DateTime.Now;
                     db.Households.Add(household);
                     user.HouseholdId = household.Id;
+
+                    roleHelper.AddUserToRole(user.Id, "Head of Household");
 
                     db.SaveChanges();
 
@@ -164,6 +243,7 @@ namespace dc_portal.Controllers
                 user.HouseholdId = null;
                 roleHelper.RemoveUserFromRole(user.Id, "Head of Household");
                 roleHelper.AddUserToRole(user.Id, "Guest");
+                TempData["Deleted-HH"] = "You have successfully deleted your Household!";
                 db.SaveChanges();
                 await ControllerContext.HttpContext.RefreshAuthentication(user);
             }
@@ -187,6 +267,8 @@ namespace dc_portal.Controllers
                     return RedirectToAction("Details", "Households", new { id = user.HouseholdId });
                 }
 
+                //add successor option here
+
                 var myhousehold = db.Households.Find(id);
                 TempData["Congrats-Leave"] = $"You have successfully left the Household, {myhousehold.Name} ! ";
                 db.Households.Remove(myhousehold);
@@ -198,7 +280,21 @@ namespace dc_portal.Controllers
                 return RedirectToAction("Dashboard", "Home");
             }
 
+            if (User.IsInRole("Member"))
+            {
+                var userId = User.Identity.GetUserId();
+                var user = db.Users.Find(userId);
 
+                var myhousehold = db.Households.Find(id);
+                TempData["Congrats-Leave"] = $"You have successfully left the Household, {myhousehold.Name} ! ";
+                db.Households.Remove(myhousehold);
+                user.HouseholdId = null;
+                roleHelper.RemoveUserFromRole(user.Id, "Member");
+                roleHelper.AddUserToRole(user.Id, "Guest");
+                db.SaveChanges();
+                await ControllerContext.HttpContext.RefreshAuthentication(user);
+                return RedirectToAction("Dashboard", "Home");
+            }
 
             if (id == null)
             {
@@ -228,9 +324,6 @@ namespace dc_portal.Controllers
             await ControllerContext.HttpContext.RefreshAuthentication(user);
             return RedirectToAction("Dashboard", "Home");
         }
-
-
-
 
 
 

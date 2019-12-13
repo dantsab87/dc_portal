@@ -177,9 +177,11 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\TransactionsController.cs" />
+    <Compile Include="Enums\AccountType.cs" />
     <Compile Include="Enums\TransactionType.cs" />
     <Compile Include="Extensions\AuthExtension.cs" />
     <Compile Include="Extensions\InvitationExtensions.cs" />
+    <Compile Include="Extensions\TransactionExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -191,6 +193,7 @@
     <Compile Include="Models\BankAccount.cs" />
     <Compile Include="Models\Budget.cs" />
     <Compile Include="Models\BudgetItem.cs" />
+    <Compile Include="Models\CustomViewModel.cs" />
     <Compile Include="Models\EmailModel.cs" />
     <Compile Include="Models\ExtendedViewModel.cs" />
     <Compile Include="Models\Household.cs" />
@@ -374,6 +377,7 @@
     <Content Include="private.config" />
     <Content Include="Views\Account\NotFoundError.cshtml" />
     <Content Include="Views\Account\AcceptError.cshtml" />
+    <Content Include="Views\Households\Config.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

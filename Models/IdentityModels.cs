@@ -27,6 +27,7 @@ namespace dc_portal.Models
         public string AvatarPath { get; set; }
 
 
+        public virtual Household Household { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<BankAccount> BankAccounts { get; set; }
         public virtual ICollection<Transaction> Transactions { get; set; }

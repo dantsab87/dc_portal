@@ -175,49 +175,6 @@
                     </div>
                     <ul class="nav nav-primary">
                         <li class="nav-item active">
-                            <a data-toggle="collapse" href="#acc" class="collapsed" aria-expanded="false">
-                                <i class="fas fa-crown"></i>
-                                <p>Bank Account</p>
-                                <span class="caret"></span>
-                            </a>
-                            <div class="collapse" id="acc">
-                                <ul class="nav nav-collapse">
-                                    <li>
-                                        <a href="@Url.Action("Create","BankAccounts")"><span class="sub-item"> Create</span></a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("Edit","BankAccounts")"><span class="sub-item"> Edit</span></a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("View","BankAccounts")"><span class="sub-item"> Delete</span></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-                        <li class="nav-item active">
-                            <a data-toggle="collapse" href="#xaction" class="collapsed" aria-expanded="false">
-                                <i class="far fa-clone"></i>
-                                <p>Transaction Management </p>
-                                <span class="caret"></span>
-                            </a>
-                            <div class="collapse" id="xaction">
-                                <ul class="nav nav-collapse">
-
-                                    <li>
-                                        <a href="@Url.Action("Create","Transactions")"><span class="sub-item">Create</span></a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("Edit","Transactions")"><span class="sub-item">Edit</span></a>
-                                    </li>
-                                    <li>
-                                        <a href="@Url.Action("Details","Transactions")"><span class="sub-item">Details</span></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
-                        <li class="nav-item active">
                             <a data-toggle="collapse" href="#hhmanage" class="collapsed" aria-expanded="false">
                                 <i class="fas fa-ticket-alt"></i>
                                 <p>Household Management </p>
@@ -228,25 +185,78 @@
                                     @if (User.IsInRole("Guest"))
                                     {
                                         <li>
-                                            <a href="@Url.Action("Create","Households")"><span class="sub-item"> Create</span></a>
+                                            <a href="@Url.Action("Create", "Households")"><span class="sub-item"> Create</span></a>
                                         </li>
                                     }
                                     else
                                     {
                                         <li>
+                                            <a href="@Url.Action("Config", "Households", new { id = user.HouseholdId })"><span class="sub-item">Configuration</span></a>
+                                        </li>
+                                        <li>
                                             <a href="@Url.Action("Details", "Households", new { id = user.HouseholdId })"><span class="sub-item">View</span></a>
                                         </li>
                                         <li>
-                                            <a href="@Url.Action("Leave", "Households", new { id = user.HouseholdId })"><span class="sub-item">Leave HH</span></a>
+                                            <a href="@Url.Action("Leave", "Households", new { id = user.HouseholdId })"><span class="sub-item">Leave Household</span></a>
                                         </li>
                                         <li>
-                                            <span class="sub-item">@Html.ActionLink("Send Invitations", "Create", "Invitations")</span>
+                                            @Html.ActionLink("Send Invitations", "Create", "Invitations")
                                         </li>
                                     }
 
                                 </ul>
                             </div>
                         </li>
+                        @if (User.IsInRole("Member") || User.IsInRole("Head of Household"))
+                        {
+                            <li class="nav-item active">
+                                <a data-toggle="collapse" href="#acc" class="collapsed" aria-expanded="false">
+                                    <i class="fas fa-crown"></i>
+                                    <p>Account Management</p>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="acc">
+                                    <ul class="nav nav-collapse">
+                                        <li>
+                                            <a href="@Url.Action("Create","BankAccounts")"><span class="sub-item">Create Bank Accounts</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("Edit","BankAccounts")"><span class="sub-item">Edit Bank Accounts</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("Delete","BankAccounts")"><span class="sub-item">Delete Bank Accounts</span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li class="nav-item active">
+                                <a data-toggle="collapse" href="#xaction" class="collapsed" aria-expanded="false">
+                                    <i class="far fa-clone"></i>
+                                    <p>Transaction Management </p>
+                                    <span class="caret"></span>
+                                </a>
+                                <div class="collapse" id="xaction">
+                                    <ul class="nav nav-collapse">
+
+                                        <li>
+                                            <a href="@Url.Action("Create","Transactions")"><span class="sub-item">Create</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("Edit","Transactions")"><span class="sub-item">Edit</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("Delete", "Transaction")"><span class="sub-item">Delete Transaction</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="@Url.Action("Details","Transactions")"><span class="sub-item">Void</span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                        }
+
 
                     </ul>
                 </div>
@@ -325,6 +335,8 @@
     <!-- Atlantis JS -->
     <script src="~/Scripts/Main/atlantis.min.js"></script>
 
+    <script src="http://cdn.jsdelivr.net/npm/autonumeric@4.5.4"></script>
+
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
@@ -347,7 +359,7 @@
         if (nodelete_message != '') {
             Swal.fire({
                 icon: 'error',
-                title: 'Error!',
+                title: 'Error!!',
                 text: nodelete_message
             })
         }
@@ -358,8 +370,42 @@
         if (yayleave_message != '') {
             Swal.fire({
                 icon: 'success',
-                title: 'Horrah!!',
+                title: 'Horrah!',
                 text: yayleave_message
+            })
+        }
+    </script>
+
+    <script>
+        var deleted_message = '@TempData["Deleted-HH"]';
+        if (deleted_message != '') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: deleted_message
+            })
+        }
+    </script>
+
+
+    <script>
+        var inv_sent = '@TempData["Invitation-Sent"]';
+        if (inv_sent != '') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: inv_sent
+            })
+        }
+    </script>
+
+    <script>
+        var complete_config_HH = '@TempData["Complete_HH_config"]';
+        if (complete_config_HH != '') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: complete_config_HH
             })
         }
     </script>

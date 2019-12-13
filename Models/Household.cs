@@ -11,7 +11,7 @@ namespace dc_portal.Models
         public string Name { get; set; }
         public string Greeting { get; set; }
         public DateTime Created { get; set; }
-
+        public bool IsConfigured { get; set; }
 
 
         //Child

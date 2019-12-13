@@ -197,6 +197,7 @@ namespace dc_portal.Controllers
                 return View("NotFoundError", invitation);
 
             var expirationDate = invitation.Created.AddDays(invitation.TTL);
+
             if (invitation.IsValid && DateTime.Now < expirationDate)
             {
                 var houseHoldName = db.Households.Find(invitation.HouseholdId).Name;
