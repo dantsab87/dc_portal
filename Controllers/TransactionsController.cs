@@ -19,8 +19,12 @@ namespace dc_portal.Controllers
         // GET: Transactions
         public ActionResult Index()
         {
-            var transactions = db.Transactions.Include(t => t.BankAccount).Include(t => t.BudgetItem).Include(t => t.Owner);
-            return View(transactions.ToList());
+            var userId = User.Identity.GetUserId();
+            var user = db.Users.Find(userId);
+
+            var myTransactions = db.Transactions.Where(mt => mt.OwnerId == user.Id);
+            //var transactions = db.Transactions.Include(t => t.BankAccount).Include(t => t.BudgetItem).Include(t => t.Owner);
+            return View(myTransactions.ToList());
         }
 
         // GET: Transactions/Details/5
@@ -42,10 +46,13 @@ namespace dc_portal.Controllers
         public ActionResult Create()
         {
             var houseId = db.Users.Find(User.Identity.GetUserId()).HouseholdId ?? 0;
-            ViewBag.BankAccountId = new SelectList(db.BankAccounts.Where(b => b.HouseholdId == houseId), "Id", "Name");
-            //ViewBag.BudgetItemId = new SelectList(db.BudgetItems.Where(bi=>bi.BudgetItems == houseId), "Id", "Name");
+            var myhouse = db.Households.Find(houseId);
+
+            ViewBag.BankAccountId = new SelectList(db.BankAccounts.Where(ba => ba.HouseholdId == houseId), "Id", "Name");
+            ViewBag.BudgetId = new SelectList(db.Budgets.Where(b => b.HouseholdId == houseId), "Id", "Name");
+            ViewBag.BudgetItemId = new SelectList(db.BudgetItems.Where(bi=>bi.Budget.HouseholdId == houseId), "Id", "Name");
             //ViewBag.BankAccountId = new SelectList(db.BankAccounts, "Id", "OwnerId");
-            ViewBag.BudgetItemId = new SelectList(db.BudgetItems, "Id", "Name");
+            //ViewBag.BudgetItemId = new SelectList(db.BudgetItems, "Id", "Name");
             //ViewBag.OwnerId = new SelectList(db.Users, "Id", "FirstName");
             return View();
         }

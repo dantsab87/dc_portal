@@ -190,9 +190,13 @@
                                     }
                                     else
                                     {
-                                        <li>
-                                            <a href="@Url.Action("Config", "Households", new { id = user.HouseholdId })"><span class="sub-item">Configuration</span></a>
-                                        </li>
+                                        if (user.Household.IsConfigured == false)
+                                        {
+                                            <li>
+                                                <a href="@Url.Action("Config", "Households", new { id = user.HouseholdId })"><span class="sub-item">Configuration</span></a>
+                                            </li>
+                                        }
+
                                         <li>
                                             <a href="@Url.Action("Details", "Households", new { id = user.HouseholdId })"><span class="sub-item">View</span></a>
                                         </li>
@@ -217,6 +221,9 @@
                                 </a>
                                 <div class="collapse" id="acc">
                                     <ul class="nav nav-collapse">
+                                        <li>
+                                            <a href="@Url.Action("Index","BankAccounts")"><span class="sub-item">Bank Accounts</span></a>
+                                        </li>
                                         <li>
                                             <a href="@Url.Action("Create","BankAccounts")"><span class="sub-item">Create Bank Accounts</span></a>
                                         </li>
@@ -243,6 +250,9 @@
                                             <a href="@Url.Action("Create","Transactions")"><span class="sub-item">Create</span></a>
                                         </li>
                                         <li>
+                                            <a href="@Url.Action("Index","Transactions")"><span class="sub-item">History</span></a>
+                                        </li>
+                                        @*<li>
                                             <a href="@Url.Action("Edit","Transactions")"><span class="sub-item">Edit</span></a>
                                         </li>
                                         <li>
@@ -250,7 +260,8 @@
                                         </li>
                                         <li>
                                             <a href="@Url.Action("Details","Transactions")"><span class="sub-item">Void</span></a>
-                                        </li>
+                                        </li>*@
+
                                     </ul>
                                 </div>
                             </li>

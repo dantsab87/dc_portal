@@ -13,7 +13,7 @@ namespace dc_portal.Extensions
 
         public static void UpdateBalances(this Transaction transaction)
         {
-            UpdateBalances(transaction);
+            UpdateBankBalances(transaction);
             UpdateBudgetBalances(transaction);
             UpdateBudgetItemBalance(transaction);
         }
@@ -51,7 +51,7 @@ namespace dc_portal.Extensions
             db.SaveChanges();
         }
 
-        private static void UpdateBankBalance(Transaction transaction)
+        private static void UpdateBankBalances(Transaction transaction)
         {
             var bank = db.BankAccounts.Find(transaction.BankAccountId);
             if (transaction.TransactionType == TransactionType.Deposit)

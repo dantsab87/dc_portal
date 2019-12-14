@@ -51,8 +51,10 @@ namespace dc_portal.Controllers
 
             if (Id != null && Id != 0 && user.Household.IsConfigured == false) 
             {
-                ViewBag.HouseholdId = (int)Id;
-                return View(Id);
+                var configVm = new ConfigVM();
+
+                configVm.HouseHoldId = (int)Id;
+                return View(configVm);
             }
             return RedirectToAction("Dashboard", "Home");
         }
@@ -65,8 +67,8 @@ namespace dc_portal.Controllers
             var userId = User.Identity.GetUserId();
             var user = db.Users.Find(userId);
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 var bank = new BankAccount
                 {
                     HouseholdId = configVM.HouseHoldId,
@@ -111,9 +113,12 @@ namespace dc_portal.Controllers
                 db.SaveChanges();
 
                 return RedirectToAction("Dashboard", "Home");
-            }
-            return View(configVM);
+            //}
+
+            //return View(configVM);
         }
+
+
 
 
         // GET: Households/Create

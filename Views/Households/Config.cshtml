@@ -7,11 +7,11 @@
 <h2>Configuration</h2>
 
 
-@using (Html.BeginForm("Config", "Households", FormMethod.Post, new { @class = "" , enctype = "Multipart/form-data"}))
+@using (Html.BeginForm("Config", "Households", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary("", new { @class = "text-danger" })
-    @Html.Hidden("HouseholdId", (int)ViewBag.HouseholdId);
+    @Html.HiddenFor(m=>m.HouseHoldId);
 
     <div class="form-horizontal">
         <h4>Bank Account</h4>

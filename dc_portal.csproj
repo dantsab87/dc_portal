@@ -378,6 +378,7 @@
     <Content Include="Views\Account\NotFoundError.cshtml" />
     <Content Include="Views\Account\AcceptError.cshtml" />
     <Content Include="Views\Households\Config.cshtml" />
+    <None Include="Properties\PublishProfiles\dchangportal - Web Deploy.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using dc_portal.Models;
+using Microsoft.AspNet.Identity;
 
 namespace dc_portal.Controllers
 {
@@ -17,8 +18,13 @@ namespace dc_portal.Controllers
         // GET: BankAccounts
         public ActionResult Index()
         {
+            var userId = User.Identity.GetUserId();
+            var user = db.Users.Find(userId);
+
             var bankAccounts = db.BankAccounts.Include(b => b.Household).Include(b => b.Owner);
-            return View(bankAccounts.ToList());
+            var myBankAccounts = db.BankAccounts.Where(ba => ba.OwnerId == user.Id);
+            //return View(bankAccounts.ToList());
+            return View(myBankAccounts.ToList());
         }
 
         // GET: BankAccounts/Details/5
