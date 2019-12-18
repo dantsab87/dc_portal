@@ -206,6 +206,9 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Avatars\default.png" />
+    <Content Include="Avatars\koolaid.png" />
+    <Content Include="Avatars\mrburns.png" />
     <Content Include="Avatars\scrooge.png" />
     <Content Include="Content\default\bootstrap-theme.css" />
     <Content Include="Content\default\bootstrap-theme.min.css" />
@@ -379,6 +382,7 @@
     <Content Include="Views\Account\AcceptError.cshtml" />
     <Content Include="Views\Households\Config.cshtml" />
     <None Include="Properties\PublishProfiles\dchangportal - Web Deploy.pubxml" />
+    <Content Include="Views\Households\Leave.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -25,6 +26,16 @@ namespace dc_portal.Models
         public string DisplayName { get; set; }
 
         public string AvatarPath { get; set; }
+
+
+        [NotMapped]
+        public string FullName
+        {
+            get
+            {
+                return $"{FirstName}" + " " + $"{LastName}";
+            }
+        }
 
 
         public virtual Household Household { get; set; }

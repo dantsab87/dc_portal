@@ -23,7 +23,12 @@ namespace dc_portal.Controllers
         // GET: Households
         public ActionResult Index()
         {
-            return View(db.Households.ToList());
+            var userId = User.Identity.GetUserId();
+            var user = db.Users.Find(userId);
+            var userHousehold = db.Households.Where(h=>h.Id == user.HouseholdId).ToList();
+
+            return View(userHousehold);
+            //return View(db.Households.ToList());
         }
 
         // GET: Households/Details/5
@@ -260,29 +265,42 @@ namespace dc_portal.Controllers
         // GET: Households/Leave/5
         public async Task<ActionResult> Leave(int? id)
         {
+            Household household = db.Households.Find(id);
             if (User.IsInRole("Head of Household"))
             {
                 var userId = User.Identity.GetUserId();
                 var user = db.Users.Find(userId);
                 var totalusers = db.Users.Where(t => t.HouseholdId == user.HouseholdId).Count();
-
                 if (totalusers > 1)
                 {
-                    TempData["CantDelete"] = "Unable to leave Household because there are others still occupying the Household!";
-                    return RedirectToAction("Details", "Households", new { id = user.HouseholdId });
+                    var myhousehold = user.HouseholdId;
+                    //var members = db.Users.Where(u => u.HouseholdId == myhousehold && u.Id != userId);
+                    var members = roleHelper.UsersInRole("Member").Where(m=>m.HouseholdId == myhousehold).ToList();
+
+                    ViewBag.HouseMembers = new SelectList(members, "Id", "FullName");
+                    return View();
+                    //TempData["CantDelete"] = "Unable to leave Household because there are others still occupying the Household!";
+                    //return RedirectToAction("Details", "Households", new { id = user.HouseholdId });
+
+                    //add successor option here//
+
                 }
+                //var myhousehold = user.HouseholdId;
+                //RoleHelper roleHelper = new RoleHelper();
+                //var members = roleHelper.UsersInRole("Member").ToList();
+                //var members = db.Users.Where(u => u.HouseholdId == myhousehold && u.Id != userId);
 
-                //add successor option here
 
-                var myhousehold = db.Households.Find(id);
-                TempData["Congrats-Leave"] = $"You have successfully left the Household, {myhousehold.Name} ! ";
-                db.Households.Remove(myhousehold);
-                user.HouseholdId = null;
-                roleHelper.RemoveUserFromRole(user.Id, "Head of Household");
-                roleHelper.AddUserToRole(user.Id, "Guest");
-                db.SaveChanges();
-                await ControllerContext.HttpContext.RefreshAuthentication(user);
-                return RedirectToAction("Dashboard", "Home");
+                //ViewBag.HouseMembers = new SelectList(members, "Id", "FirstName");
+
+                //TempData["Congrats-Leave"] = $"You have successfully left the Household, {myhousehold.Name} ! ";
+                //db.Households.Remove(myhousehold);
+                //user.HouseholdId = null;
+                //roleHelper.RemoveUserFromRole(user.Id, "Head of Household");
+                //roleHelper.AddUserToRole(user.Id, "Guest");
+                //db.SaveChanges();
+                //await ControllerContext.HttpContext.RefreshAuthentication(user);
+                //return RedirectToAction("Dashboard", "Home");
             }
 
             if (User.IsInRole("Member"))
@@ -305,7 +323,7 @@ namespace dc_portal.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Household household = db.Households.Find(id);
+
             if (household == null)
             {
                 return HttpNotFound();
@@ -320,13 +338,19 @@ namespace dc_portal.Controllers
         {
             var userId = User.Identity.GetUserId();
             var user = db.Users.Find(userId);
+            RoleHelper roleHelper = new RoleHelper();
 
-            Household household = db.Households.Find(id);
-            db.Households.Remove(household);
-            roleHelper.RemoveUserFromRole(user.Id, "Head of Household");
-            roleHelper.AddUserToRole(user.Id, "Guest");
-            db.SaveChanges();
-            await ControllerContext.HttpContext.RefreshAuthentication(user);
+
+            if (User.IsInRole("Head of Household")) 
+            {
+                Household household = db.Households.Find(id);
+                db.Households.Remove(household);
+                roleHelper.RemoveUserFromRole(user.Id, "Head of Household");
+                roleHelper.AddUserToRole(user.Id, "Guest");
+                db.SaveChanges();
+                await ControllerContext.HttpContext.RefreshAuthentication(user);
+                return RedirectToAction("Dashboard", "Home");
+            }
             return RedirectToAction("Dashboard", "Home");
         }
 

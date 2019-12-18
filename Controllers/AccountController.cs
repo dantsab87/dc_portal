@@ -178,25 +178,28 @@ namespace dc_portal.Controllers
             return View(model);
         }
 
-        //get
+        //GET: AcceptInvitation
         [AllowAnonymous]
         public ActionResult AcceptInvitation(string recipientEmail, string code, int Id) 
         {
 
-            var checkemail = db.Users.Where(u => u.Email == recipientEmail);
-            if (checkemail != null)
-            {
-                InvitationHelper.MarkAsInvalid(Id);
-                return RedirectToAction("Index", "Home");
-            }
+            //var checkemail = db.Users.Where(u => u.Email == recipientEmail);
+
 
             var realGuid = Guid.Parse(code);
             var invitation = db.Invitations.FirstOrDefault(i => i.RecipientEmail == recipientEmail && i.Code == realGuid);
+            var expirationDate = invitation.Created.AddDays(invitation.TTL);
+
+            ////if (checkemail != null)
+            ////{
+            ////    InvitationHelper.MarkAsInvalid(Id);
+            ////    return RedirectToAction("Index", "Home");
+            ////}
 
             if (invitation == null)
                 return View("NotFoundError", invitation);
 
-            var expirationDate = invitation.Created.AddDays(invitation.TTL);
+
 
             if (invitation.IsValid && DateTime.Now < expirationDate)
             {
@@ -214,7 +217,8 @@ namespace dc_portal.Controllers
                 return View(invitationVm);
             }
 
-            return View("AcceptError", invitation);
+            return View();
+            //return View("AcceptError", invitation);
         }
 
         [AllowAnonymous]
@@ -232,7 +236,7 @@ namespace dc_portal.Controllers
                     DisplayName = invitationvm.DisplayName,
                     UserName = invitationvm.Email,
                     Email = invitationvm.Email,
-                    AvatarPath = "Avatars/default.png",
+                    AvatarPath = "/Avatars/default.png",
                     HouseholdId = invitationvm.HouseholdId
                 };
 
